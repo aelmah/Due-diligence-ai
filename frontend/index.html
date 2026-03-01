@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diligence AI — Enterprise Intelligence Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --border-light: #252c3d;
+    --gold: #c9a84c;
+    --gold-dim: #8a6e32;
+    --gold-glow: rgba(201, 168, 76, 0.15);
+    --red: #e05252;
+    --red-dim: rgba(224, 82, 82, 0.12);
+    --orange: #e08a3c;
+    --yellow: #d4b84a;
+    --green: #4caf7d;
+    --green-dim: rgba(76, 175, 125, 0.12);
+    --blue: #5b8dee;
+    --blue-dim: rgba(91, 141, 238, 0.1);
+    --text: #e8e4d9;
+    --text-dim: #7a7d8a;
+    --text-mid: #a8a8b3;
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    background: rgba(10, 11, 15, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 64px 48px;
+  }
+
+  /* UPLOAD SECTION */
+  .upload-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 80px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .hero-text h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-text p {
+    color: var(--text-mid);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 420px;
+    margin-bottom: 32px;
+  }
+
+  .agent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .agent-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .agent-chip::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--gold-dim);
+    border-radius: 50%;
+  }
+
+  /* UPLOAD PANEL */
+  .upload-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .panel-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+
+  .company-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+  }
+
+  input[type="text"] {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--gold);
+  }
+
+  input[type="text"]::placeholder {
+    color: var(--text-dim);
+  }
+
+  .drop-zone {
+    border: 1px dashed var(--border-light);
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--gold);
+    background: var(--gold-glow);
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+
+  .drop-text {
+    color: var(--text-mid);
+    font-size: 13px;
+  }
+
+  .drop-hint {
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 6px;
+  }
+
+  .file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .file-type-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .file-type-badge.financial { background: rgba(201, 168, 76, 0.1); color: var(--gold); border: 1px solid var(--gold-dim); }
+  .file-type-badge.legal { background: rgba(91, 141, 238, 0.1); color: var(--blue); border: 1px solid rgba(91, 141, 238, 0.3); }
+  .file-type-badge.news { background: rgba(76, 175, 125, 0.1); color: var(--green); border: 1px solid rgba(76, 175, 125, 0.3); }
+  .file-type-badge.esg { background: rgba(224, 82, 82, 0.1); color: var(--orange); border: 1px solid rgba(224, 138, 60, 0.3); }
+  .file-type-badge.other { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+
+  .btn-analyze {
+    background: var(--gold);
+    color: #0a0b0f;
+    border: none;
+    padding: 13px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-analyze:hover:not(:disabled) {
+    background: #e8c05a;
+    transform: translateY(-1px);
+  }
+
+  .btn-analyze:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .progress-section.visible { display: block; }
+
+  .progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .progress-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 24px;
+    color: var(--gold);
+  }
+
+  .progress-bar-track {
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.5s ease;
+    position: relative;
+  }
+
+  .progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -2px;
+    width: 6px;
+    height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .progress-agents {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .agent-status {
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .agent-status.active {
+    border-color: var(--gold);
+    background: var(--gold-glow);
+  }
+
+  .agent-status.done {
+    border-color: rgba(76, 175, 125, 0.3);
+    background: var(--green-dim);
+  }
+
+  .agent-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .agent-status.active .agent-name { color: var(--gold); }
+  .agent-status.done .agent-name { color: var(--green); }
+
+  .agent-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-light);
+  }
+
+  .agent-status.active .agent-indicator {
+    background: var(--gold);
+    animation: pulse 1s ease infinite;
+  }
+
+  .agent-status.done .agent-indicator { background: var(--green); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.5); }
+  }
+
+  .current-step {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* RESULTS */
+  .results-section {
+    display: none;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .results-section.visible { display: block; }
+
+  .results-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-company {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .results-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .risk-score-display {
+    text-align: right;
+  }
+
+  .risk-score-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .risk-score-number.score-low { color: var(--green); }
+  .risk-score-number.score-moderate { color: var(--yellow); }
+  .risk-score-number.score-elevated { color: var(--orange); }
+  .risk-score-number.score-high { color: var(--red); }
+  .risk-score-number.score-critical { color: var(--red); }
+
+  .risk-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* GRID LAYOUT */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .results-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+  }
+
+  /* RECOMMENDATION */
+  .recommendation-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .rec-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 1px solid var(--border-light);
+  }
+
+  .rec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .rec-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .rec-AVOID { color: var(--red); }
+  .rec-CAUTION { color: var(--orange); }
+  .rec-NEUTRAL { color: var(--text-mid); }
+  .rec-CONSIDER { color: var(--yellow); }
+  .rec-RECOMMEND { color: var(--green); }
+
+  .rec-summary {
+    color: var(--text-mid);
+    font-size: 13px;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .confidence-display {
+    text-align: right;
+  }
+
+  .conf-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    color: var(--gold);
+  }
+
+  .conf-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* AGENT SCORES */
+  .agent-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .agent-score-card {
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ascore-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .ascore-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .ascore-bar {
+    height: 2px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .ascore-bar-fill {
+    height: 100%;
+    transition: width 0.8s ease;
+  }
+
+  /* FLAGS */
+  .flag-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+
+  .flag-severity {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    height: fit-content;
+    flex-shrink: 0;
+  }
+
+  .flag-severity.high { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224, 82, 82, 0.3); }
+  .flag-severity.medium { background: rgba(224, 138, 60, 0.1); color: var(--orange); border: 1px solid rgba(224, 138, 60, 0.3); }
+  .flag-severity.low { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(91, 141, 238, 0.2); }
+
+  .flag-content { flex: 1; }
+
+  .flag-finding {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .flag-evidence {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    border-left: 2px solid var(--border-light);
+    padding-left: 8px;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* KEY RISKS */
+  .risk-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .risk-item:last-child { border-bottom: none; }
+
+  .risk-rank {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    color: var(--border-light);
+    line-height: 1;
+    min-width: 28px;
+  }
+
+  .risk-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    margin-bottom: 4px;
+    display: inline-block;
+  }
+
+  .risk-cat.Financial { background: rgba(201, 168, 76, 0.1); color: var(--gold); border: 1px solid var(--gold-dim); }
+  .risk-cat.Legal { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(91, 141, 238, 0.3); }
+  .risk-cat.Reputation { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76, 175, 125, 0.3); }
+  .risk-cat.ESG { background: rgba(224, 138, 60, 0.1); color: var(--orange); border: 1px solid rgba(224, 138, 60, 0.3); }
+
+  .risk-text { font-size: 13px; color: var(--text-mid); margin-top: 3px; }
+
+  /* ACTIONS */
+  .action-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-mid);
+  }
+
+  .action-item:last-child { border-bottom: none; }
+
+  .action-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    background: var(--gold-glow);
+    border: 1px solid var(--gold-dim);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* STRENGTH ITEMS */
+  .strength-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-mid);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .strength-item:last-child { border-bottom: none; }
+  .strength-item::before { content: '↗'; color: var(--green); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* CRITICAL FLAGS */
+  .critical-item {
+    padding: 10px 12px;
+    background: var(--red-dim);
+    border: 1px solid rgba(224, 82, 82, 0.2);
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .critical-item::before { content: '⚠'; font-size: 14px; flex-shrink: 0; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab:hover { color: var(--text-mid); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* API KEY NOTICE */
+  .api-notice {
+    background: rgba(201, 168, 76, 0.05);
+    border: 1px solid var(--gold-dim);
+    padding: 12px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  /* ERROR */
+  .error-banner {
+    background: var(--red-dim);
+    border: 1px solid rgba(224, 82, 82, 0.3);
+    padding: 16px 20px;
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
+  .error-banner.visible { display: block; }
+
+  /* RESET BTN */
+  .btn-reset {
+    background: none;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 8px 16px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+  @media (max-width: 900px) {
+    main { padding: 40px 20px; }
+    header { padding: 0 20px; }
+    .upload-section { grid-template-columns: 1fr; }
+    .results-grid, .results-grid-3 { grid-template-columns: 1fr; }
+    .agent-scores-grid, .progress-agents { grid-template-columns: repeat(2, 1fr); }
+    .recommendation-card { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">D</div>
+    Diligence AI
+  </div>
+  <div class="badge">Enterprise Intelligence Engine</div>
+</header>
+
+<main>
+
+  <!-- UPLOAD SECTION -->
+  <section class="upload-section" id="uploadSection">
+    <div class="hero-text">
+      <h1>Investment risk<br/>intelligence, <em>automated.</em></h1>
+      <p>Upload financial reports, legal filings, news coverage, and ESG documents. Four specialized AI agents analyze everything and deliver a structured risk report in minutes.</p>
+      <div class="agent-list">
+        <div class="agent-chip">Financial Risk Agent — numbers, trends, anomalies</div>
+        <div class="agent-chip">Legal & Compliance Agent — litigation, regulatory exposure</div>
+        <div class="agent-chip">Reputation & Media Agent — sentiment, narrative analysis</div>
+        <div class="agent-chip">ESG & Governance Agent — ethical flags, board issues</div>
+        <div class="agent-chip">Master Reasoning Agent — synthesis & recommendation</div>
+      </div>
+    </div>
+
+    <div class="upload-panel">
+      <div class="panel-title">New Analysis</div>
+
+      <div class="api-notice">
+        ⚙ Configure MISTRAL_API_KEY in backend/.env before running
+      </div>
+
+      <div id="errorBanner" class="error-banner"></div>
+
+      <div class="company-input-wrapper">
+        <label for="companyName">Company Name</label>
+        <input type="text" id="companyName" placeholder="e.g. Tesla, Inc." />
+      </div>
+
+      <div>
+        <label style="margin-bottom:8px;display:block">Upload Documents</label>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" multiple accept=".pdf,.txt,.json,.md" />
+          <div class="drop-icon">⬆</div>
+          <div class="drop-text">Drop files here or click to browse</div>
+          <div class="drop-hint">PDF • TXT • JSON — Max 10 files</div>
+        </div>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div id="backendUrl" style="display:flex;flex-direction:column;gap:6px">
+        <label for="apiUrl">Backend URL</label>
+        <input type="text" id="apiUrl" value="http://localhost:8000" />
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" disabled onclick="startAnalysis()">
+        Run Due Diligence Analysis
+      </button>
+    </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="progress-section" id="progressSection">
+    <div class="progress-header">
+      <div class="progress-title">Analyzing <span id="progressCompany"></span></div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="current-step" id="currentStep">Initializing agents...</div>
+    <div class="progress-agents">
+      <div class="agent-status" id="ag-financial">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="agent-name">Financial</div>
+          <div class="agent-indicator"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim)">Risk & Metrics</div>
+      </div>
+      <div class="agent-status" id="ag-legal">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="agent-name">Legal</div>
+          <div class="agent-indicator"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim)">Compliance</div>
+      </div>
+      <div class="agent-status" id="ag-reputation">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="agent-name">Reputation</div>
+          <div class="agent-indicator"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim)">Media & Sentiment</div>
+      </div>
+      <div class="agent-status" id="ag-esg">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="agent-name">ESG</div>
+          <div class="agent-indicator"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim)">Governance</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results-section" id="resultsSection">
+    <div class="results-header">
+      <div>
+        <div class="results-company" id="resCompany"></div>
+        <div class="results-meta" id="resMeta"></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:32px">
+        <div class="risk-score-display">
+          <div class="risk-score-number" id="resScore">—</div>
+          <div class="risk-label" id="resRating">RISK SCORE</div>
+        </div>
+        <button class="btn-reset" onclick="resetAnalysis()">↺ New Analysis</button>
+      </div>
+    </div>
+
+    <!-- Recommendation -->
+    <div class="recommendation-card" id="recCard">
+      <div class="rec-icon" id="recIcon">—</div>
+      <div>
+        <div class="rec-label">Investment Recommendation</div>
+        <div class="rec-value" id="recValue">—</div>
+        <div class="rec-summary" id="recSummary"></div>
+      </div>
+      <div class="confidence-display">
+        <div class="conf-value" id="confValue">—</div>
+        <div class="conf-label">Confidence</div>
+      </div>
+    </div>
+
+    <!-- Agent Scores -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Agent Risk Scores <span class="card-badge">0–100</span></div>
+      <div class="agent-scores-grid" id="agentScoresGrid"></div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="results-grid">
+      <!-- Key Risks -->
+      <div class="card">
+        <div class="card-title">Key Risks Identified</div>
+        <div id="keyRisks"></div>
+      </div>
+
+      <!-- Critical Flags -->
+      <div class="card">
+        <div class="card-title">Critical Flags</div>
+        <div id="criticalFlags"></div>
+        <div class="card-title" style="margin-top:20px">Recommended Actions</div>
+        <div id="recActions"></div>
+      </div>
+    </div>
+
+    <!-- Strengths -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">Identified Strengths</div>
+      <div id="strengths"></div>
+    </div>
+
+    <!-- Agent Deep Dive Tabs -->
+    <div class="card">
+      <div class="card-title">Agent Detailed Findings</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('financial')">Financial</button>
+        <button class="tab" onclick="switchTab('legal')">Legal</button>
+        <button class="tab" onclick="switchTab('reputation')">Reputation</button>
+        <button class="tab" onclick="switchTab('esg')">ESG</button>
+      </div>
+      <div id="tab-financial" class="tab-panel active"></div>
+      <div id="tab-legal" class="tab-panel"></div>
+      <div id="tab-reputation" class="tab-panel"></div>
+      <div id="tab-esg" class="tab-panel"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let selectedFiles = [];
+  let pollInterval = null;
+  let currentJobId = null;
+  let reportData = null;
+
+  // ── File Handling ──────────────────────────────────────
+  const fileInput = document.getElementById('fileInput');
+  const dropZone = document.getElementById('dropZone');
+
+  fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  function handleFiles(fileList) {
+    for (const f of fileList) {
+      if (!selectedFiles.find(x => x.name === f.name)) {
+        selectedFiles.push(f);
+      }
+    }
+    renderFileList();
+    updateBtn();
+  }
+
+  function guessType(name) {
+    name = name.toLowerCase();
+    if (/financial|annual|10k|balance|income|earnings/.test(name)) return 'financial';
+    if (/legal|lawsuit|filing|contract|sec|regulatory/.test(name)) return 'legal';
+    if (/news|article|press|media|release/.test(name)) return 'news';
+    if (/esg|sustainability|environment|governance/.test(name)) return 'esg';
+    return 'other';
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = '';
+    for (const f of selectedFiles) {
+      const t = guessType(f.name);
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <span style="font-size:11px;color:var(--text-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${f.name}</span>
+        <span class="file-type-badge ${t}">${t}</span>
+      `;
+      list.appendChild(item);
+    }
+  }
+
+  function updateBtn() {
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = selectedFiles.length === 0;
+  }
+
+  // ── Analysis ───────────────────────────────────────────
+  async function startAnalysis() {
+    const company = document.getElementById('companyName').value.trim() || 'Unknown Company';
+    const apiUrl = document.getElementById('apiUrl').value.trim();
+
+    hideError();
+
+    // Show progress
+    document.getElementById('uploadSection').style.opacity = '0.4';
+    document.getElementById('uploadSection').style.pointerEvents = 'none';
+    document.getElementById('progressSection').classList.add('visible');
+    document.getElementById('progressCompany').textContent = company;
+
+    // Build form data
+    const formData = new FormData();
+    formData.append('company_name', company);
+    for (const f of selectedFiles) {
+      formData.append('files', f);
+    }
+
+    try {
+      const resp = await fetch(`${apiUrl}/analyze`, { method: 'POST', body: formData });
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || 'Server error');
+      }
+      const { job_id } = await resp.json();
+      currentJobId = job_id;
+      pollInterval = setInterval(() => pollStatus(apiUrl, job_id), 1200);
+    } catch (e) {
+      showError(`Failed to start analysis: ${e.message}. Is the backend running at ${apiUrl}?`);
+      resetProgress();
+    }
+  }
+
+  async function pollStatus(apiUrl, jobId) {
+    try {
+      const resp = await fetch(`${apiUrl}/status/${jobId}`);
+      const data = await resp.json();
+
+      updateProgress(data.progress || 0, data.current_agent || '');
+
+      if (data.status === 'done') {
+        clearInterval(pollInterval);
+        renderResults(data.result);
+      } else if (data.status === 'error') {
+        clearInterval(pollInterval);
+        showError(`Analysis failed: ${data.error}`);
+        resetProgress();
+      }
+    } catch (e) {
+      clearInterval(pollInterval);
+      showError(`Lost connection to backend: ${e.message}`);
+      resetProgress();
+    }
+  }
+
+  function updateProgress(pct, step) {
+    document.getElementById('progressPct').textContent = `${pct}%`;
+    document.getElementById('progressFill').style.width = `${pct}%`;
+    if (step) document.getElementById('currentStep').textContent = step;
+
+    // Highlight agents based on step
+    const stepL = step.toLowerCase();
+    const agents = ['financial', 'legal', 'reputation', 'esg'];
+    for (const a of agents) {
+      const el = document.getElementById(`ag-${a}`);
+      el.classList.remove('active', 'done');
+      if (stepL.includes(a)) {
+        el.classList.add('active');
+      } else if (
+        (a === 'financial' && pct > 35) ||
+        (a === 'legal' && pct > 55) ||
+        (a === 'reputation' && pct > 72) ||
+        (a === 'esg' && pct > 85)
+      ) {
+        el.classList.add('done');
+      }
+    }
+  }
+
+  // ── Render Results ─────────────────────────────────────
+  function scoreClass(s) {
+    if (s >= 80) return 'score-critical';
+    if (s >= 65) return 'score-high';
+    if (s >= 45) return 'score-elevated';
+    if (s >= 25) return 'score-moderate';
+    return 'score-low';
+  }
+
+  function scoreColor(s) {
+    if (s >= 80) return 'var(--red)';
+    if (s >= 65) return 'var(--orange)';
+    if (s >= 45) return 'var(--yellow)';
+    if (s >= 25) return 'var(--text-mid)';
+    return 'var(--green)';
+  }
+
+  const recIcons = { AVOID: '✕', CAUTION: '⚠', NEUTRAL: '◐', CONSIDER: '↗', RECOMMEND: '✓' };
+
+  function renderResults(report) {
+    reportData = report;
+    const m = report.master || {};
+
+    document.getElementById('progressSection').classList.remove('visible');
+    document.getElementById('resultsSection').classList.add('visible');
+
+    // Header
+    document.getElementById('resCompany').textContent = report.company_name;
+    const date = new Date(report.generated_at).toLocaleDateString('en-US', { dateStyle: 'long' });
+    document.getElementById('resMeta').textContent =
+      `Generated ${date} · ${report.documents_analyzed} document(s) analyzed · ${(report.document_types||[]).join(', ')}`;
+
+    // Score
+    const score = m.overall_risk_score || 0;
+    const riskEl = document.getElementById('resScore');
+    riskEl.textContent = score;
+    riskEl.className = `risk-score-number ${scoreClass(score)}`;
+    document.getElementById('resRating').textContent = m.risk_rating || 'RISK SCORE';
+
+    // Recommendation
+    const rec = m.investment_recommendation || 'NEUTRAL';
+    document.getElementById('recIcon').textContent = recIcons[rec] || '—';
+    const recVal = document.getElementById('recValue');
+    recVal.textContent = rec;
+    recVal.className = `rec-value rec-${rec}`;
+    document.getElementById('recSummary').textContent = m.executive_summary || '';
+    const conf = m.confidence_score || 0;
+    document.getElementById('confValue').textContent = `${Math.round(conf * 100)}%`;
+
+    // Agent Scores
+    const scores = m.agent_scores || {};
+    const agNames = ['financial', 'legal', 'reputation', 'esg'];
+    const agLabels = { financial: 'Financial', legal: 'Legal', reputation: 'Reputation', esg: 'ESG' };
+    const grid = document.getElementById('agentScoresGrid');
+    grid.innerHTML = '';
+    for (const k of agNames) {
+      const s = scores[k] || 0;
+      const color = scoreColor(s);
+      grid.innerHTML += `
+        <div class="agent-score-card">
+          <div class="ascore-label">${agLabels[k]}</div>
+          <div class="ascore-value" style="color:${color}">${s}</div>
+          <div class="ascore-bar"><div class="ascore-bar-fill" style="width:${s}%;background:${color}"></div></div>
+        </div>`;
+    }
+
+    // Key Risks
+    const kr = document.getElementById('keyRisks');
+    kr.innerHTML = '';
+    for (const r of (m.key_risks || [])) {
+      kr.innerHTML += `
+        <div class="risk-item">
+          <div class="risk-rank">${r.rank || ''}</div>
+          <div>
+            <div class="risk-cat ${r.category}">${r.category}</div>
+            <div class="risk-text">${r.risk}</div>
+          </div>
+        </div>`;
+    }
+
+    // Critical Flags
+    const cf = document.getElementById('criticalFlags');
+    cf.innerHTML = '';
+    for (const f of (m.critical_flags || [])) {
+      cf.innerHTML += `<div class="critical-item">${f}</div>`;
+    }
+
+    // Actions
+    const ra = document.getElementById('recActions');
+    ra.innerHTML = '';
+    (m.recommended_actions || []).forEach((a, i) => {
+      ra.innerHTML += `<div class="action-item"><span class="action-num">${i+1}</span>${a}</div>`;
+    });
+
+    // Strengths
+    const st = document.getElementById('strengths');
+    st.innerHTML = '';
+    for (const s of (m.strengths || [])) {
+      st.innerHTML += `<div class="strength-item">${s}</div>`;
+    }
+
+    // Agent Tabs
+    const agents = report.agents || {};
+    renderAgentTab('financial', agents.financial || {});
+    renderAgentTab('legal', agents.legal || {});
+    renderAgentTab('reputation', agents.reputation || {});
+    renderAgentTab('esg', agents.esg || {});
+  }
+
+  function renderAgentTab(id, data) {
+    const panel = document.getElementById(`tab-${id}`);
+    if (!data || Object.keys(data).length === 0) {
+      panel.innerHTML = '<p style="color:var(--text-dim);font-size:13px">No data available.</p>';
+      return;
+    }
+
+    const score = data.risk_score || 0;
+    const confidence = data.confidence || 0;
+    const summary = data.summary || '';
+    const flags = data.flags || [];
+
+    let extraHtml = '';
+    if (id === 'financial' && data.key_metrics) {
+      const km = data.key_metrics;
+      extraHtml = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+        ${Object.entries(km).map(([k, v]) => `
+          <div style="padding:10px;background:var(--bg);border:1px solid var(--border)">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:4px">${k.replace(/_/g,' ')}</div>
+            <div style="font-size:12px;color:var(--text)">${v}</div>
+          </div>`).join('')}
+      </div>`;
+    }
+    if (id === 'legal' && data.categories) {
+      const cats = data.categories;
+      extraHtml = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+        ${Object.entries(cats).map(([k, v]) => `
+          <div style="padding:10px;background:var(--bg);border:1px solid var(--border)">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:4px">${k.replace(/_/g,' ')}</div>
+            <div style="font-size:12px;color:var(--text)">${v}</div>
+          </div>`).join('')}
+      </div>`;
+    }
+
+    panel.innerHTML = `
+      <div style="display:flex;gap:24px;margin-bottom:20px">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px">Risk Score</div>
+          <div style="font-family:'Playfair Display',serif;font-size:36px;color:${scoreColor(score)}">${score}</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Summary</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.7;font-style:italic">${summary}</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px">Confidence</div>
+          <div style="font-family:'DM Mono',monospace;font-size:20px;color:var(--gold)">${Math.round(confidence*100)}%</div>
+        </div>
+      </div>
+      ${extraHtml}
+      <div style="font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:12px">Findings & Evidence</div>
+      ${flags.map(f => `
+        <div class="flag-item">
+          <span class="flag-severity ${f.severity}">${f.severity}</span>
+          <div class="flag-content">
+            <div class="flag-finding">${f.finding}</div>
+            ${f.evidence ? `<div class="flag-evidence">"${f.evidence}"</div>` : ''}
+          </div>
+        </div>`).join('') || '<p style="color:var(--text-dim);font-size:13px">No flags identified.</p>'}
+    `;
+  }
+
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      const ids = ['financial', 'legal', 'reputation', 'esg'];
+      t.classList.toggle('active', ids[i] === id);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => {
+      p.classList.toggle('active', p.id === `tab-${id}`);
+    });
+  }
+
+  // ── Helpers ────────────────────────────────────────────
+  function showError(msg) {
+    const el = document.getElementById('errorBanner');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideError() {
+    document.getElementById('errorBanner').classList.remove('visible');
+  }
+
+  function resetProgress() {
+    document.getElementById('uploadSection').style.opacity = '1';
+    document.getElementById('uploadSection').style.pointerEvents = 'auto';
+    document.getElementById('progressSection').classList.remove('visible');
+    updateProgress(0, '');
+  }
+
+  function resetAnalysis() {
+    selectedFiles = [];
+    renderFileList();
+    updateBtn();
+    hideError();
+    document.getElementById('resultsSection').classList.remove('visible');
+    document.getElementById('uploadSection').style.opacity = '1';
+    document.getElementById('uploadSection').style.pointerEvents = 'auto';
+    document.getElementById('progressSection').classList.remove('visible');
+  }
+</script>
+</body>
+</html>

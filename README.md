@@ -1,10 +1,5 @@
-# 🔍 Diligence AI — Multi-Agent Due Diligence Engine
+#  Diligence AI- Multi-Agent Due Diligence Engine
 
-> "Upload any company's documents. Get a full AI-generated investment risk report in minutes."
-
-Built for the **Mistral AI Hackathon** — Enterprise Intelligence Engine powered by multi-agent reasoning.
-
----
 
 ## Architecture
 
@@ -168,23 +163,5 @@ files: File[] (PDF, TXT, JSON)
 | Frontend | Vanilla HTML/CSS/JS |
 | Structured Output | JSON schema + safe parser |
 
----
 
-## Why This Wins
 
-- **Multi-agent architecture** — not a single prompt wrapper
-- **Parallel execution** — all 4 agents run concurrently
-- **Structured outputs** — JSON schema enforced at every layer
-- **Evidence citations** — every flag backed by document quotes
-- **Real business value** — investors, VCs, M&A teams use this daily
-- **Clean demo** — real-time progress + polished dashboard
-
----
-
-## Extending This Project
-
-- 🎙️ **Voice Brief** — add ElevenLabs TTS for audio executive summary
-- 💬 **Follow-up Q&A** — conversational agent to interrogate the report
-- 🗄️ **Vector DB** — add FAISS/Chroma for large document RAG
-- 📊 **Historical Comparison** — compare risk scores across time
-- 🔗 **API Integrations** — Bloomberg, SEC EDGAR, Crunchbase data feeds
